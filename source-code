@@ -1,0 +1,190 @@
+
+import pygame
+import random
+
+
+
+pygame.init()
+
+font = pygame.font.SysFont(None, 25)
+# Define some colors
+BLACK    = (   0,   0,   0)
+WHITE    = ( 255, 255, 255)
+GREEN    = (   0, 255,   0)
+RED      = ( 255,   0,   0)
+BLUE     = (   0,   0, 255)
+
+PI = 3.1416
+
+
+
+
+
+def check255(RGBvalue): #function to make sure RGB colour values are valid
+    if RGBvalue > 255:
+        RGBvalue = 0
+    elif RGBvalue < 0:
+        RGBvalue = 255
+    return RGBvalue
+
+
+resolution = pygame.display.Info() #get the user computer's resolution
+size = (resolution.current_w, resolution.current_h) #size is a tuple of the user computer's screen dimensions
+screen = pygame.display.set_mode(size,pygame.FULLSCREEN) #creates a fullscreen interface for this program
+
+pygame.display.set_caption("My Picture") #calls the window My Picture
+
+def message(font, msg, colour, x, y): #function to blit text onto the screen
+    text = font.render(msg, True, colour)
+    screen.blit(text, (x, y))
+
+def info(Colour): #function that presents information for how to use the program
+    message(font, "Left Click and drag to draw", Colour, 10,50)
+    message(font, "Middle Click and drag to draw straight", Colour, 10,100)
+    message(font, "Right Click and drag to erase", Colour, 10,150)
+    message(font, "Press DOWN ARROW to Increase thickness", Colour, 10,200)
+    message(font, "Press SPACE to Decrease thickness", Colour, 10,250)
+    message(font, "Press UP ARROW to Increase Red", Colour, 10,300)
+    message(font, "Press LEFT ARROW to Increase Blue", Colour, 10,350)
+    message(font, "Press RIGHT ARROW to Increase Green", Colour, 10,400)
+    message(font, "Press BACKSPACE to CLEAR SCREEN (and instructions)", Colour, 10,450)
+    message(font, "Press H to hide instructions", Colour, 10,500)
+    message(font, "Press I to show instructions", Colour, 10,550)
+    message(font, "Press Q to quit", Colour, 10,600)
+
+done = False #variable that is set to False unless the user wants to exit the program
+instructions = True #variable that is set to True if instructions are displayed on screen
+
+
+clock = pygame.time.Clock() # Used to manage how fast the screen updates
+
+#randomizing the starting colour for the program
+R = random.randint(0,255)
+G = random.randint(0,255)
+B = random.randint(0,255)
+randColour = (R,G,B)
+
+#filling the screen with "WELCOME TO PYGAME PAINT" because it looks cool
+for i in range(2000):
+    pygame.display.flip()
+    rand_x = random.randint(0,size[0]-245)
+    rand_y = random.randint(0,size[1])
+    print('welcome')
+    message(font, "WELCOME TO PYGAME PAINT", randColour, rand_x, rand_y)
+
+pygame.time.wait(2000)
+screen.fill(BLACK)
+
+#displays "WELCOME TO PYGAME PAINT" in screen center in big text
+for i in range(100):
+    pygame.display.flip()
+    message(pygame.font.SysFont(None, round((155/1680)*size[0])), "WELCOME TO PYGAME PAINT", randColour, 50,3*size[1]/7)
+
+
+screen.fill(WHITE)
+thick = 10 #represents brush size
+
+background = WHITE #represents the colour of the drawing surface
+info(BLACK)
+straight = False #boolean that's True when user wants to draw a straight line
+
+
+
+# -------- Main Program Loop -----------
+while not done:
+
+
+
+       # --- Main event loop
+
+   for event in pygame.event.get(): # User did something
+       mouse_x, mouse_y = pygame.mouse.get_pos() #gets position of mouse
+
+       #setting the brush colour
+       R = check255(R)
+       G = check255(G)
+       B = check255(B)
+       randColour = (R,G,B)
+
+       #presenting the brush colour in RGB tuple
+       screen.fill(WHITE, (44, size[1]-75, 144 ,size[1]))
+       change = 3
+       print(randColour)
+       message(font, str(randColour), randColour, 44, size[1] - 50)
+
+       #presenting frame rate
+       message(font, str(pygame.time.Clock()), randColour, 44, size[1] - 75)
+
+       ########USER INPUT LOGIC##########
+
+       if event.type == pygame.KEYDOWN: #If user presses a key
+
+           if pygame.key.get_pressed()[pygame.K_h] == True and instructions == True: #pressing 'h' hides instructions
+               pygame.draw.rect(screen, background, [10, 50,515,575], 0)
+               instructions = False
+
+           if pygame.key.get_pressed()[pygame.K_LSHIFT] == True: #pressing 'shift'(left) allows user to reduce RGB values
+               print("LSHIFT")
+               change = change * -1
+
+           #How user can change RGB tuple values
+           if pygame.key.get_pressed()[pygame.K_UP] == True:
+               print("Up")
+               R += change
+           if pygame.key.get_pressed()[pygame.K_LEFT] == True:
+               print("Left")
+               G += change
+           if pygame.key.get_pressed()[pygame.K_RIGHT] == True:
+               print("Right")
+               B += change
+
+           #How user can change brush size
+           if pygame.key.get_pressed()[pygame.K_DOWN] == True:
+               print("Down")
+               thick += 1
+           if pygame.key.get_pressed()[pygame.K_SPACE] == True:
+               thick -= 1
+
+           if pygame.key.get_pressed()[pygame.K_BACKSPACE] == True: #Backspace fills screen with WHITE colour
+               screen.fill(WHITE)
+               background = WHITE
+               instructions = False
+
+           if pygame.key.get_pressed()[pygame.K_TAB] == True: #Tab fills the screen with the user's desired colour
+               background = randColour
+               screen.fill(randColour)
+               instructions = False
+
+           if pygame.key.get_pressed()[pygame.K_i] == True and instructions == False: #I key presents instructions to screen
+               instructions = True
+               info((check255(background[0] - 150), check255(background[1] - 150),check255(background[2] - 150)))
+
+           if pygame.key.get_pressed()[pygame.K_q] == True: # If user presses q, program will end
+               print("QUIT event read from event queue!")
+               done = True # Flag that we are done so we exit this loop
+
+
+
+
+       if pygame.mouse.get_pressed()[0] == True: #Left Click and drag to draw
+           mouse_x, mouse_y = pygame.mouse.get_pos()
+           pygame.draw.rect(screen, randColour, [mouse_x, mouse_y, thick, thick], 0)
+
+       if pygame.mouse.get_pressed()[2] == True: #Right Click and drag to erase (colour in with background)
+           print("Right Click")
+           pygame.draw.rect(screen, background, [mouse_x, mouse_y, thick, thick], 0)
+
+       #Middle Click (or press c) and drag to draw a straight line
+       if (pygame.key.get_pressed()[pygame.K_c] == True or pygame.mouse.get_pressed()[1] == True) and straight == False:
+           x1, y1 = pygame.mouse.get_pos()
+           straight = True
+       if (pygame.key.get_pressed()[pygame.K_c] == False and pygame.mouse.get_pressed()[1] == False) and straight == True:
+           x2,y2 = pygame.mouse.get_pos()
+           pygame.draw.line(screen, randColour, [x1, y1], [x2,y2], thick)
+           straight = False
+
+
+
+       clock.tick(760) #Limits frame rate to 760fps
+       pygame.display.flip()
+pygame.quit()
