@@ -29,7 +29,7 @@ def check255(RGBvalue): #function to make sure RGB colour values are valid
 
 
 resolution = pygame.display.Info() #get the user computer's resolution
-size = (resolution.current_w, resolution.current_h) #size is a tuple of the user computer's screen dimensions
+size = (resolution.current_w-400, resolution.current_h-200) #size is a tuple of the user computer's screen dimensions
 screen = pygame.display.set_mode(size,pygame.FULLSCREEN) #creates a fullscreen interface for this program
 
 pygame.display.set_caption("My Picture") #calls the window My Picture
